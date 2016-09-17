@@ -248,7 +248,7 @@ module Isuda
 
       user_id = register(name, pw)
       redis_users.hset('users', name, user_id)
-      session[:user_name] = user_name
+      session[:user_name] = name
 
       redirect_found '/'
     end
