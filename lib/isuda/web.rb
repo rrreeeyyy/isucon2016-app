@@ -14,7 +14,7 @@ require 'rack-lineprof'
 
 module Isuda
   class Web < ::Sinatra::Base
-    logger = Logger.new("/tmp/app.log-#{Time.now.strftime("%Y-%m-%d-%H:%M:%S")}")
+    logger = Logger.new("/tmp/app.log-#{Time.now.strftime("%Y-%m-%d-%H-%M-%S")}")
     use Rack::Lineprof
     use Rack::CommonLogger, logger
 
