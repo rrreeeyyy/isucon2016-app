@@ -84,7 +84,7 @@ module Isuda
           INSERT INTO user (name)
           VALUES (?)
         |, name)
-        name
+        db.first_id
       end
 
       def encode_with_salt(password: , salt: )
@@ -246,8 +246,8 @@ module Isuda
       pw   = params[:password] || ''
       halt(400) if (name == '') || (pw == '')
 
-      user_name = register(name, pw)
-      redis_users.hset('users', name, db.first_id)
+      user_id = register(name, pw)
+      redis_users.hset('users', name, user_id)
       session[:user_name] = user_name
 
       redirect_found '/'
