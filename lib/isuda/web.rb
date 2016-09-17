@@ -124,7 +124,7 @@ module Isuda
       end
 
       def load_stars(keyword)
-        db.xquery(%| select keyword from star where keyword = ? |, keyword).to_a
+        db.xquery(%| select keyword from isutar.star where keyword = ? |, keyword).to_a
         #isutar_url = URI(settings.isutar_origin)
         #isutar_url.path = '/stars'
         #isutar_url.query = URI.encode_www_form(keyword: keyword)
@@ -171,7 +171,7 @@ module Isuda
       #isuda_keyword_url = URI(settings.isuda_origin)
       #isuda_keyword_url.path = '/keyword/%s' % [Rack::Utils.escape_path(keyword)]
       res = db.xquery(%| select keyword from entry where keyword = ? |, keyword).to_a
-      if res.enpty? do
+      if res.enpty?
           halt(404)
       end
       user_name = params[:user]
