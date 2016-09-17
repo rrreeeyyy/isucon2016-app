@@ -12,11 +12,11 @@ require 'tilt/erubis'
 require 'rack-lineprof'
 
 logger = Logger.new("/tmp/app.log-#{Time.now.strftime("%Y-%m-%d-%H:%M:%S")}")
-use Rack::CommonLogger, logger
 
 module Isuda
   class Web < ::Sinatra::Base
     use Rack::Lineprof
+    use Rack::CommonLogger, logger
 
     enable :protection
     enable :sessions

@@ -14,6 +14,7 @@ use Rack::CommonLogger, logger
 module Isutar
   class Web < ::Sinatra::Base
     use Rack::Lineprof
+    use Rack::CommonLogger, logger
     enable :protection
 
     set :db_user, ENV['ISUTAR_DB_USER'] || 'root'
