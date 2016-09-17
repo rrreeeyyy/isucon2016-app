@@ -257,6 +257,10 @@ module Isuda
         ON DUPLICATE KEY UPDATE
         author_id = ?, keyword = ?, description = ?, updated_at = NOW()
       |, *bound)
+      candidate_keywords = db.xquery(%|SELECT keyword FROM entry WHERE match(description) against(?)|, params[:keyword])
+      candidate_keywords.each do |keyword|
+        redis.hdel('entries', keyword)
+      end
 
       redirect_found '/'
     end
