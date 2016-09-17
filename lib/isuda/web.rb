@@ -11,10 +11,10 @@ require 'sinatra/base'
 require 'tilt/erubis'
 require 'rack-lineprof'
 
-logger = Logger.new("/tmp/app.log-#{Time.now.strftime("%Y-%m-%d-%H:%M:%S")}")
 
 module Isuda
   class Web < ::Sinatra::Base
+    logger = Logger.new("/tmp/app.log-#{Time.now.strftime("%Y-%m-%d-%H:%M:%S")}")
     use Rack::Lineprof
     use Rack::CommonLogger, logger
 
