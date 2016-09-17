@@ -280,7 +280,7 @@ module Isuda
       description = params[:description]
       halt(400) if is_spam_content(description) || is_spam_content(keyword)
 
-      user = db.xquery(%|SELECT id from user where name = ?|, @user_name)
+      user = db.xquery(%|SELECT id from user where name = ?|, @user_name).first
       bound = [user[:id], keyword, description] * 2
       db.xquery(%|
         INSERT INTO entry (author_id, keyword, description, updated_at)
