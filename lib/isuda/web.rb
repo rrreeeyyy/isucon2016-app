@@ -12,6 +12,8 @@ require 'tilt/erubis'
 
 module Isuda
   class Web < ::Sinatra::Base
+    use Rack::Lineprof
+
     enable :protection
     enable :sessions
 

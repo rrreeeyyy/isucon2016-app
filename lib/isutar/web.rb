@@ -9,6 +9,7 @@ require 'sinatra/base'
 
 module Isutar
   class Web < ::Sinatra::Base
+    use Rack::Lineprof
     enable :protection
 
     set :db_user, ENV['ISUTAR_DB_USER'] || 'root'
