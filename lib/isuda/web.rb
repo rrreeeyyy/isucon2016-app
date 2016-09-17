@@ -141,7 +141,7 @@ module Isuda
       db.xquery(%| DELETE FROM entry WHERE id > 7101 |)
       #db.xquery(%| ALTER TABLE entry DROP created_at |)
       redis.flushall
-      entries = db.xquery(%| SELECT keyword, description FROM entry WHERE id > 7101 |)
+      entries = db.xquery(%| SELECT keyword, description FROM entry|)
       entries.each do |entry|
         redis.hset('entries', entry[:keyword], htmlify(entry[:description]))
       end
