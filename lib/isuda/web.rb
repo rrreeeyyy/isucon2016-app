@@ -153,6 +153,13 @@ module Isuda
       JSON.generate(result: 'ok')
     end
 
+    get '/htmlify_initialize' do
+      entries = db.xquery(%| SELECT keyword, description FROM entry WHERE id > 7101 |)
+      entries.each do |entry|
+        redis.hset('entry', entry[keyword], htmlify(entry[:description])
+      end
+    end
+
     get '/', set_name: true do
       per_page = 10
       page = (params[:page] || 1).to_i
