@@ -283,6 +283,7 @@ module Isuda
       end
 
       db.xquery(%| DELETE FROM entry WHERE keyword = ? |, keyword)
+      redis.hdel('entries', keyword)
 
       redirect_found '/'
     end
