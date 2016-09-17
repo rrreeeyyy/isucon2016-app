@@ -295,6 +295,7 @@ module Isuda
       candidate_keywords.each do |keyword|
         redis.hdel('entries', keyword)
       end
+      redis.hset('entries', params[:keyword], htmlify(params[:description]))
 
       redirect_found '/'
     end
