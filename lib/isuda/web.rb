@@ -308,6 +308,7 @@ module Isuda
         entry[:html] = redis.hget('entries', entry[:keyword])
       else
         entry[:html] = htmlify(entry[:description])
+        redis.hset('entires', entry[:keyword], entry[:html])
       end
       entry[:stars] = load_stars(entry[:keyword])
 
