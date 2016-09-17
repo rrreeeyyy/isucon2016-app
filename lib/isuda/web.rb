@@ -173,7 +173,7 @@ module Isuda
       |)
       entries.each do |entry|
         if redis.hexists('entries', entry[:keyword])
-          entry[:html] = redis.hget(entry[:keyword])
+          entry[:html] = redis.hget('entries', entry[:keyword])
         else
           entry[:html] = htmlify(entry[:description])
         end
