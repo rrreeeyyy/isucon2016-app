@@ -124,7 +124,7 @@ module Isuda
       end
 
       def load_stars(keyword)
-        stars = db.xquery(%| select * from isutar.star where keyword = ? |, keyword).to_a
+        stars = db.xquery(%| select user_name from isutar.star where keyword = ? |, keyword).to_a
         #isutar_url = URI(settings.isutar_origin)
         #isutar_url.path = '/stars'
         #isutar_url.query = URI.encode_www_form(keyword: keyword)
