@@ -10,6 +10,7 @@ require 'rack/utils'
 require 'sinatra/base'
 require 'tilt/erubis'
 require 'rack-lineprof'
+require 'redis'
 
 
 module Isuda
@@ -20,6 +21,9 @@ module Isuda
 
     enable :protection
     enable :sessions
+
+    redis = Redis.new(:host => "127.0.0.1", :port => 6379, :db => 0)
+    TTL = 86400
 
     set :erb, escape_html: true
     set :public_folder, File.expand_path('../../../../public', __FILE__)
@@ -135,6 +139,11 @@ module Isuda
     get '/initialize' do
       db.xquery(%| DELETE FROM entry WHERE id > 7101 |)
       #db.xquery(%| ALTER TABLE entry DROP created_at |)
+      redis.flushall
+      users = db.xquery(%| SELECT name from user |)
+      users.each do |user|
+	redis.sadd('users', user[:name])
+      end
       isutar_initialize_url = URI(settings.isutar_origin)
       isutar_initialize_url.path = '/initialize'
       Net::HTTP.get_response(isutar_initialize_url)
