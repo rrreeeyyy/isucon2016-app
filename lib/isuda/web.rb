@@ -33,7 +33,7 @@ module Isuda
     set :dsn, ENV['ISUDA_DSN'] || 'dbi:mysql:db=isuda'
     set :session_secret, 'tonymoris'
     set :isupam_origin, ENV['ISUPAM_ORIGIN'] || 'http://localhost:5050'
-    set :isutar_origin, ENV['ISUTAR_ORIGIN'] || 'http://localhost:5001'
+    set :isutar_origin, ENV['ISUTAR_ORIGIN'] || 'http://localhost:5000'
 
     configure :development do
       require 'sinatra/reloader'
@@ -153,7 +153,7 @@ module Isuda
       end
       isutar_initialize_url = URI(settings.isutar_origin)
       isutar_initialize_url.path = '/initialize'
-      #Net::HTTP.get_response(isutar_initialize_url)
+      Net::HTTP.get_response(isutar_initialize_url)
 
       content_type :json
       JSON.generate(result: 'ok')
