@@ -171,9 +171,17 @@ module Isuda
         OFFSET #{per_page * (page - 1)}
       |)
       entries.each do |entry|
-        entry[:html] = htmlify(entry[:description])
+        if redis.hexist('entries', entry[:keyword])
+          entry[:html] = redis.hget(entry[:keyword])
+        else
+          entry[:html] = htmlify(entry[:description])
+        end
         entry[:stars] = load_stars(entry[:keyword])
       end
+      # entries.each do |entry|
+      #   entry[:html] = htmlify(entry[:description])
+      #   entry[:stars] = load_stars(entry[:keyword])
+      # end
 
       total_entries = db.xquery(%| SELECT count(id) AS total_entries FROM entry |).first[:total_entries].to_i
 
