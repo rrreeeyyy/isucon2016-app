@@ -151,9 +151,9 @@ module Isuda
       users.each do |user|
 	      redis_users.hset('users', user[:name], user[:id])
       end
-      isutar_initialize_url = URI(settings.isutar_origin)
+      #isutar_initialize_url = URI(settings.isutar_origin)
       isutar_initialize_url.path = '/initialize'
-      Net::HTTP.get_response(isutar_initialize_url)
+      #Net::HTTP.get_response(isutar_initialize_url)
 
       content_type :json
       JSON.generate(result: 'ok')
