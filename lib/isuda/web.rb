@@ -84,7 +84,7 @@ module Isuda
           INSERT INTO user (name)
           VALUES (?)
         |, name)
-        redis.sadd('user', name)
+        redis_users.sadd('user', name)
         name
       end
 
