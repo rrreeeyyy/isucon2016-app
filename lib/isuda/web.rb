@@ -48,7 +48,7 @@ module Isuda
           is_exist = redis.sismember('users', user_name)
           @user_id = user_id
           @user_name = user_name
-          halt(403) unless @user_name
+          halt(403) unless is_exist
         end
       }
     end
