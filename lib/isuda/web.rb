@@ -156,7 +156,7 @@ module Isuda
     get '/htmlify_initialize' do
       entries = db.xquery(%| SELECT keyword, description FROM entry WHERE id > 7101 |)
       entries.each do |entry|
-        redis.hset('entry', entry[keyword], htmlify(entry[:description])
+        redis.hset('entry', entry[keyword], htmlify(entry[:description]))
       end
     end
 
