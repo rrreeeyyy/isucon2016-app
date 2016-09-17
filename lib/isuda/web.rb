@@ -84,7 +84,7 @@ module Isuda
           INSERT INTO user (name)
           VALUES (?)
         |, name)
-        db.first_id
+        db.last_id
       end
 
       def encode_with_salt(password: , salt: )
