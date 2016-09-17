@@ -23,6 +23,7 @@ module Isuda
     enable :sessions
 
     redis = Redis.new(:host => "127.0.0.1", :port => 6379, :db => 0)
+    redis_users = Redis.new(:host => "127.0.0.1", :port => 6379, :db => 1)
     TTL = 86400
 
     set :erb, escape_html: true
@@ -45,7 +46,7 @@ module Isuda
         user_id = session[:user_id]
         user_name = session[:user_name]
         if user_id
-          is_exist = redis.sismember('users', user_name)
+          is_exist = redis_users.sismember('users', user_name)
           @user_id = user_id
           @user_name = user_name
           halt(403) unless is_exist
@@ -140,10 +141,10 @@ module Isuda
     get '/initialize' do
       db.xquery(%| DELETE FROM entry WHERE id > 7101 |)
       #db.xquery(%| ALTER TABLE entry DROP created_at |)
-      redis.flushall
+      redis_users.flushall
       users = db.xquery(%| SELECT name from user |)
       users.each do |user|
-	redis.sadd('users', user[:name])
+	      redis_users.sadd('users', user[:name])
       end
       isutar_initialize_url = URI(settings.isutar_origin)
       isutar_initialize_url.path = '/initialize'
