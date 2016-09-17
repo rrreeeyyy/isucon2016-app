@@ -84,8 +84,7 @@ module Isuda
           INSERT INTO user (name)
           VALUES (?)
         |, name)
-        redis_users.sadd('user', name)
-        name
+        redis_users.hset('users', name, db.first_id)
       end
 
       def encode_with_salt(password: , salt: )
