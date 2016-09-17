@@ -124,7 +124,7 @@ module Isuda
       end
 
       def load_stars(keyword)
-        stars = db.xquery(%| select * from isutar.star where keyword = ? |, keyword).to_a
+        stars = db.xquery(%| select user_name from isutar.star where keyword = ? |, keyword).to_a
         #isutar_url = URI(settings.isutar_origin)
         #isutar_url.path = '/stars'
         #isutar_url.query = URI.encode_www_form(keyword: keyword)
@@ -295,6 +295,7 @@ module Isuda
       candidate_keywords.each do |keyword|
         redis.hdel('entries', keyword)
       end
+      redis.hset('entries', params[:keyword], htmlify(params[:description]))
 
       redirect_found '/'
     end
@@ -303,8 +304,12 @@ module Isuda
       keyword = params[:keyword] or halt(400)
 
       entry = db.xquery(%| select keyword, description from entry where keyword = ? |, keyword).first or halt(404)
+      if redis.hexists('entries', entry[:keyword])
+        entry[:html] = redis.hget('entries', entry[:keyword])
+      else
+        entry[:html] = htmlify(entry[:description])
+      end
       entry[:stars] = load_stars(entry[:keyword])
-      entry[:html] = htmlify(entry[:description])
 
       locals = {
         entry: entry,
