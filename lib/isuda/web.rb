@@ -79,13 +79,13 @@ module Isuda
       end
 
       def register(name, pw)
-        chars = [*'A'..'~']
-        salt = 1.upto(20).map { chars.sample }.join('')
-        salted_password = encode_with_salt(password: pw, salt: salt)
+        #chars = [*'A'..'~']
+        #salt = 1.upto(20).map { chars.sample }.join('')
+        #salted_password = encode_with_salt(password: pw, salt: salt)
         db.xquery(%|
-          INSERT INTO user (name, salt, password)
-          VALUES (?, ?, ?, NOW())
-        |, name, salt, salted_password)
+          INSERT INTO user (name)
+          VALUES (?)
+        |, name)
         db.last_id
       end
 
