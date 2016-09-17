@@ -172,7 +172,7 @@ module Isuda
         OFFSET #{per_page * (page - 1)}
       |)
       entries.each do |entry|
-        if redis.hexist('entries', entry[:keyword])
+        if redis.hexists('entries', entry[:keyword])
           entry[:html] = redis.hget(entry[:keyword])
         else
           entry[:html] = htmlify(entry[:description])
