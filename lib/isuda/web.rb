@@ -141,10 +141,6 @@ module Isuda
       db.xquery(%| DELETE FROM entry WHERE id > 7101 |)
       #db.xquery(%| ALTER TABLE entry DROP created_at |)
       redis.flushall
-      entries = db.xquery(%| SELECT keyword, description FROM entry|)
-      entries.each do |entry|
-        redis.hset('entries', entry[:keyword], htmlify(entry[:description]))
-      end
       users = db.xquery(%| SELECT name from user |)
       users.each do |user|
 	redis.sadd('users', user[:name])
@@ -155,6 +151,13 @@ module Isuda
 
       content_type :json
       JSON.generate(result: 'ok')
+    end
+
+    get '/initialize_htmlify' do
+      entries = db.xquery(%| SELECT keyword, description FROM entry|)
+      entries.each do |entry|
+        redis.hset('entries', entry[:keyword], htmlify(entry[:description]))
+      end
     end
 
     get '/', set_name: true do
