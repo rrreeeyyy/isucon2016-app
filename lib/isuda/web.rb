@@ -43,11 +43,9 @@ module Isuda
 
     set(:set_name) do |value|
       condition {
-        user_id = session[:user_id]
         user_name = session[:user_name]
-        if user_id
+        if user_name
           is_exist = redis_users.sismember('users', user_name)
-          @user_id = user_id
           @user_name = user_name
           halt(403) unless is_exist
         end
@@ -56,7 +54,7 @@ module Isuda
 
     set(:authenticate) do |value|
       condition {
-        halt(403) unless @user_id
+        halt(403) unless @user_name
       }
     end
 
@@ -86,7 +84,8 @@ module Isuda
           INSERT INTO user (name)
           VALUES (?)
         |, name)
-        db.last_id
+        redis.sadd('user', name)
+        name
       end
 
       def encode_with_salt(password: , salt: )
@@ -213,9 +212,8 @@ module Isuda
       pw   = params[:password] || ''
       halt(400) if (name == '') || (pw == '')
 
-      user_id = register(name, pw)
-      session[:user_id] = user_id
-      session[:user_name] = name
+      user_name = register(name, pw)
+      session[:user_name] = user_name
 
       redirect_found '/'
     end
@@ -229,18 +227,18 @@ module Isuda
 
     post '/login' do
       name = params[:name]
-      user = db.xquery(%| select id, name from user where name = ? |, name).first
-      halt(403) unless user
+      #user = db.xquery(%| select name from user where name = ? |, name).first
+      is_exist = redis_users.sismember('users', name)
+      halt(403) unless is_exist
       halt(403) unless user[:name] == params[:password]
 
-      session[:user_id] = user[:id]
-      session[:user_name] = user[:name]
+      session[:user_name] = params[:name]
 
       redirect_found '/'
     end
 
     get '/logout' do
-      session[:user_id] = nil
+      session[:user_name] = nil
       redirect_found '/'
     end
 
@@ -250,7 +248,8 @@ module Isuda
       description = params[:description]
       halt(400) if is_spam_content(description) || is_spam_content(keyword)
 
-      bound = [@user_id, keyword, description] * 2
+      user = db.xquery(%|SELECT id from user where name = ?|, @user_name)
+      bound = [user[:id], keyword, description] * 2
       db.xquery(%|
         INSERT INTO entry (author_id, keyword, description, updated_at)
         VALUES (?, ?, ?, NOW())
