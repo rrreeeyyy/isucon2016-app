@@ -43,10 +43,11 @@ module Isuda
     set(:set_name) do |value|
       condition {
         user_id = session[:user_id]
+        user_name = session[:user_name]
         if user_id
-          user = db.xquery(%| select name from user where id = ? |, user_id).first
+          is_exist = redis.sismember('users', user_name)
           @user_id = user_id
-          @user_name = user[:name]
+          @user_name = user_name
           halt(403) unless @user_name
         end
       }
@@ -216,6 +217,7 @@ module Isuda
       halt(403) unless user[:name] == params[:password]
 
       session[:user_id] = user[:id]
+      session[:user_name] = user[:name]
 
       redirect_found '/'
     end
