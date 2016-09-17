@@ -6,6 +6,10 @@ require 'mysql2'
 require 'mysql2-cs-bind'
 require 'rack/utils'
 require 'sinatra/base'
+require 'rack-lineprof'
+
+logger = Logger.new("/tmp/app.log-#{Time.now.strftime("%Y-%m-%d-%H:%M:%S")}")
+use Rack::CommonLogger, logger
 
 module Isutar
   class Web < ::Sinatra::Base

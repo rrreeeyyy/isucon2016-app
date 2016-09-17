@@ -9,6 +9,10 @@ require 'mysql2-cs-bind'
 require 'rack/utils'
 require 'sinatra/base'
 require 'tilt/erubis'
+require 'rack-lineprof'
+
+logger = Logger.new("/tmp/app.log-#{Time.now.strftime("%Y-%m-%d-%H:%M:%S")}")
+use Rack::CommonLogger, logger
 
 module Isuda
   class Web < ::Sinatra::Base
