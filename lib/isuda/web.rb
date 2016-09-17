@@ -230,7 +230,7 @@ module Isuda
       #user = db.xquery(%| select name from user where name = ? |, name).first
       is_exist = redis_users.sismember('users', name)
       halt(403) unless is_exist
-      halt(403) unless user[:name] == params[:password]
+      halt(403) unless params[:name] == params[:password]
 
       session[:user_name] = params[:name]
 
