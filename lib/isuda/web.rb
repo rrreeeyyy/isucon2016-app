@@ -283,7 +283,7 @@ module Isuda
       description = params[:description]
       halt(400) if is_spam_content(description) || is_spam_content(keyword)
 
-      user_id = redis.hget('users', @user_name) 
+      user_id = redis.hget('users', session[:user_name]) 
       bound = [user_id, keyword, description] * 2
       db.xquery(%|
         INSERT INTO entry (author_id, keyword, description, updated_at)
