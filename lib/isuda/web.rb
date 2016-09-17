@@ -303,8 +303,12 @@ module Isuda
       keyword = params[:keyword] or halt(400)
 
       entry = db.xquery(%| select keyword, description from entry where keyword = ? |, keyword).first or halt(404)
+      if redis.hexists('entries', entry[:keyword])
+        entry[:html] = redis.hget('entries', entry[:keyword])
+      else
+        entry[:html] = htmlify(entry[:description])
+      end
       entry[:stars] = load_stars(entry[:keyword])
-      entry[:html] = htmlify(entry[:description])
 
       locals = {
         entry: entry,
