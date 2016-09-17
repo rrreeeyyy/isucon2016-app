@@ -236,7 +236,7 @@ module Isuda
     get '/keyword/:keyword', set_name: true do
       keyword = params[:keyword] or halt(400)
 
-      entry = db.xquery(%| select * from entry where keyword = ? |, keyword).first or halt(404)
+      entry = db.xquery(%| select keyword, description from entry where keyword = ? |, keyword).first or halt(404)
       entry[:stars] = load_stars(entry[:keyword])
       entry[:html] = htmlify(entry[:description])
 
