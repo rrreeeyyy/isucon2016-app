@@ -134,7 +134,7 @@ module Isuda
 
     get '/initialize' do
       db.xquery(%| DELETE FROM entry WHERE id > 7101 |)
-      db.xquery(%| ALTER TABLE entry DROP created_at |)
+      #db.xquery(%| ALTER TABLE entry DROP created_at |)
       isutar_initialize_url = URI(settings.isutar_origin)
       isutar_initialize_url.path = '/initialize'
       Net::HTTP.get_response(isutar_initialize_url)
