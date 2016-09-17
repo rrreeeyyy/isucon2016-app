@@ -77,7 +77,7 @@ module Isuda
         salt = 1.upto(20).map { chars.sample }.join('')
         salted_password = encode_with_salt(password: pw, salt: salt)
         db.xquery(%|
-          INSERT INTO user (name, salt, password, created_at)
+          INSERT INTO user (name, salt, password)
           VALUES (?, ?, ?, NOW())
         |, name, salt, salted_password)
         db.last_id
@@ -134,6 +134,7 @@ module Isuda
 
     get '/initialize' do
       db.xquery(%| DELETE FROM entry WHERE id > 7101 |)
+      db.xquery(%| ALTER TABLE entry DROP created_at |)
       isutar_initialize_url = URI(settings.isutar_origin)
       isutar_initialize_url.path = '/initialize'
       Net::HTTP.get_response(isutar_initialize_url)
@@ -223,8 +224,8 @@ module Isuda
 
       bound = [@user_id, keyword, description] * 2
       db.xquery(%|
-        INSERT INTO entry (author_id, keyword, description, created_at, updated_at)
-        VALUES (?, ?, ?, NOW(), NOW())
+        INSERT INTO entry (author_id, keyword, description, updated_at)
+        VALUES (?, ?, ?, NOW())
         ON DUPLICATE KEY UPDATE
         author_id = ?, keyword = ?, description = ?, updated_at = NOW()
       |, *bound)
