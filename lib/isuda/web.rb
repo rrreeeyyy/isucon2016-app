@@ -141,7 +141,7 @@ module Isuda
     get '/initialize' do
       db.xquery(%| DELETE FROM entry WHERE id > 7101 |)
       #db.xquery(%| ALTER TABLE entry DROP created_at |)
-      redis_users.flushall
+      redis_users.flushdb
       users = db.xquery(%| SELECT name from user |)
       users.each do |user|
 	      redis_users.sadd('users', user[:name])
