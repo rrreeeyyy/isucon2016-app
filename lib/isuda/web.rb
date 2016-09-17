@@ -141,7 +141,7 @@ module Isuda
     get '/initialize' do
       db.xquery(%| DELETE FROM entry WHERE id > 7101 |)
       # add star 
-      db.xquery('TRUNCATE star')
+      db.xquery('TRUNCATE isutar.star')
       #db.xquery(%| ALTER TABLE entry DROP created_at |)
       redis_users.flushdb
       users = db.xquery(%| SELECT name from user |)
@@ -159,7 +159,7 @@ module Isuda
     get '/stars' do
       keyword = params[:keyword] || ''
       #stars = redis.hget("stars", keyword)
-      stars = db.xquery(%| select keyword from star where keyword = ? |, keyword).to_a
+      stars = db.xquery(%| select keyword from isutar.star where keyword = ? |, keyword).to_a
 
       content_type :json
       JSON.generate(stars: stars)
@@ -171,13 +171,13 @@ module Isuda
       #isuda_keyword_url = URI(settings.isuda_origin)
       #isuda_keyword_url.path = '/keyword/%s' % [Rack::Utils.escape_path(keyword)]
       res = db.xquery(%| select keyword from entry where keyword = ? |, keyword).to_a
-      if res.enpty?
+      if res.empty?
           halt(404)
       end
       user_name = params[:user]
       #redis.hincrby("stars", user_name)
       db.xquery(%|
-        INSERT INTO star (keyword, user_name, created_at)
+        INSERT INTO isutar.star (keyword, user_name, created_at)
         VALUES (?, ?, NOW())
       |, keyword, user_name)
 
