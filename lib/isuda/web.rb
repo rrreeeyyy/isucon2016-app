@@ -45,7 +45,7 @@ module Isuda
       condition {
         user_name = session[:user_name]
         if user_name
-          is_exist = redis_users.sismember('users', user_name)
+          is_exist = redis_users.hexists('users', user_name)
           @user_name = user_name
           halt(403) unless is_exist
         end
@@ -147,9 +147,9 @@ module Isuda
       db.xquery('TRUNCATE isutar.star')
       #db.xquery(%| ALTER TABLE entry DROP created_at |)
       redis_users.flushdb
-      users = db.xquery(%| SELECT name from user |)
+      users = db.xquery(%| SELECT id, name from user |)
       users.each do |user|
-	      redis_users.sadd('users', user[:name])
+	      redis_users.hset('users', user[:name], user[:id])
       end
       isutar_initialize_url = URI(settings.isutar_origin)
       isutar_initialize_url.path = '/initialize'
@@ -263,7 +263,7 @@ module Isuda
     post '/login' do
       name = params[:name]
       #user = db.xquery(%| select name from user where name = ? |, name).first
-      is_exist = redis_users.sismember('users', name)
+      is_exist = redis_users.hexists('users', name)
       halt(403) unless is_exist
       halt(403) unless params[:name] == params[:password]
 
@@ -283,8 +283,8 @@ module Isuda
       description = params[:description]
       halt(400) if is_spam_content(description) || is_spam_content(keyword)
 
-      user = db.xquery(%|SELECT id from user where name = ?|, @user_name).first
-      bound = [user[:id], keyword, description] * 2
+      user_id = redis.hget('users', @user_name) 
+      bound = [user_id, keyword, description] * 2
       db.xquery(%|
         INSERT INTO entry (author_id, keyword, description, updated_at)
         VALUES (?, ?, ?, NOW())
