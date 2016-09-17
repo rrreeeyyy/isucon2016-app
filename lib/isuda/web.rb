@@ -124,12 +124,13 @@ module Isuda
       end
 
       def load_stars(keyword)
-        isutar_url = URI(settings.isutar_origin)
-        isutar_url.path = '/stars'
-        isutar_url.query = URI.encode_www_form(keyword: keyword)
-        body = Net::HTTP.get(isutar_url)
-        stars_res = JSON.parse(body)
-        stars_res['stars']
+        db.xquery(%| select keyword from star where keyword = ? |, keyword).to_a
+        #isutar_url = URI(settings.isutar_origin)
+        #isutar_url.path = '/stars'
+        #isutar_url.query = URI.encode_www_form(keyword: keyword)
+        #body = Net::HTTP.get(isutar_url)
+        #stars_res = JSON.parse(body)
+        #stars_res['stars']
       end
 
       def redirect_found(path)
@@ -139,6 +140,8 @@ module Isuda
 
     get '/initialize' do
       db.xquery(%| DELETE FROM entry WHERE id > 7101 |)
+      # add star 
+      db.xquery('TRUNCATE star')
       #db.xquery(%| ALTER TABLE entry DROP created_at |)
       redis_users.flushdb
       users = db.xquery(%| SELECT name from user |)
@@ -148,6 +151,35 @@ module Isuda
       isutar_initialize_url = URI(settings.isutar_origin)
       isutar_initialize_url.path = '/initialize'
       Net::HTTP.get_response(isutar_initialize_url)
+
+      content_type :json
+      JSON.generate(result: 'ok')
+    end
+
+    get '/stars' do
+      keyword = params[:keyword] || ''
+      #stars = redis.hget("stars", keyword)
+      stars = db.xquery(%| select keyword from star where keyword = ? |, keyword).to_a
+
+      content_type :json
+      JSON.generate(stars: stars)
+    end
+
+    post '/stars' do
+      keyword = params[:keyword]
+
+      #isuda_keyword_url = URI(settings.isuda_origin)
+      #isuda_keyword_url.path = '/keyword/%s' % [Rack::Utils.escape_path(keyword)]
+      res = db.xquery(%| select keyword from entry where keyword = ? |, keyword).to_a
+      if res.enpty? do
+          halt(404)
+      end
+      user_name = params[:user]
+      #redis.hincrby("stars", user_name)
+      db.xquery(%|
+        INSERT INTO star (keyword, user_name, created_at)
+        VALUES (?, ?, NOW())
+      |, keyword, user_name)
 
       content_type :json
       JSON.generate(result: 'ok')
