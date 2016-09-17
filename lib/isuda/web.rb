@@ -250,7 +250,7 @@ module Isuda
       keyword = params[:keyword] or halt(400)
       is_delete = params[:delete] or halt(400)
 
-      unless db.xquery(%| SELECT * FROM entry WHERE keyword = ? |, keyword).first
+      unless db.xquery(%| SELECT id FROM entry WHERE keyword = ? |, keyword).first
         halt(404)
       end
 
